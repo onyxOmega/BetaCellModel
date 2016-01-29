@@ -81,32 +81,34 @@ double tMax;
 double cellClass[1000][2];
 double cellPos[cellNumber][3];
 int testBool=1;
-char* potentialname= new char;
-char* timename=new char;
-char* cellinfo=new char;
-char* calciuminfo=new char;
-char* sodiuminfo=new char;
-char* potassiuminfo=new char;
-char* caerinfo=new char;
-char* atpinfo=new char;
-char* adpinfo=new char;
-char* ikatpinfo=new char;
-char* O1info=new char;
-char* O2info=new char;
-char* C1info=new char;
-char* C2info=new char;
+char const* potentialname="potential.txt";
+char const* timename="time.txt";
+char const* calciuminfo="calcium.txt";
+char const* sodiuminfo="sodium.txt";
+char const* potassiuminfo="potassium.txt";
+char const* caerinfo="caer.txt";
+char const* atpinfo="atp.txt";
+char const* adpinfo="adp.txt";
+char const* O1info="O1.txt";
+char const* O2info="O2txt";
+char const* C1info="C1.txt";
+char const* C2info="C2.txt";
 //exocytosis variables
-char* IRPinfo=new char;
-char* PPinfo=new char;
-char* DPinfo=new char;
-char* FIPinfo=new char;
-char* RIPinfo=new char;
-char* Capinfo=new char;
-char* Noiseinfo=new char;
+
+// The exocytosis model is based on the paper "Newcomer insulin
+// secretory granules as a highly calcium sensitive pool" by Morten
+// Gram Penderson and Arthur Sherman
+char const* IRPinfo=new char; 				// immediately releasable pool		x[k+22] place
+char const* PPinfo=new char;					// primed pool								x[k+23] place
+char const* DPinfo=new char;				// Docked pool								x[k+24]
+char const* FIPinfo=new char;				// Fused pool (FHP in the paper)
+char const* RIPinfo=new char;				// Releasing pool (RHP in the paper)
+char const* Capinfo=new char;				// ??? I don't know what this one is, it's Variable 28 in the X vector
+char const* Noiseinfo=new char;				// ??? I don't know how this works, var 29 in X vector
 
 //
-double NN[cellNumber][15];
-int CBool[cellNumber]={};
+double NN[cellNumber][15];			// nearest neighbor, lists the cell numbers for up to 15 adjacent cells for each cell
+int CBool[cellNumber]={};				
 double Frequency=10; 
 double delt;
 double period1=1000*1/Frequency;
