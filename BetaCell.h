@@ -85,7 +85,7 @@ char const* timeOutput= "time.txt";
 char const* calciumOutput= "calcium.txt";
 char const* sodiumOutput= "sodium.txt";
 char const* potassiumOutput= "potassium.txt";
-char const* caerOutput= "caer.txt";
+char const* caerOutput= "caer.txt";						// endoplasmic reticulum calcim
 char const* atpOutput= "atp.txt";
 char const* adpOutput= "adp.txt";
 char const* O1Output= "O1.txt";
@@ -96,17 +96,15 @@ char const* C2Output= "C2.txt";
 // The exocytosis model is based on the paper "Newcomer insulin
 // secretory granules as a highly calcium sensitive pool" by Morten
 // Gram Penderson and Arthur Sherman
-char const* IRPOutput = "IRP.txt"; 				// immediately releasable pool		x[k+22] place
-char const* PPOutput = "PP.txt";					// primed pool								x[k+23] place
-char const* DPOutput ="DP.txt";				// Docked pool								x[k+24]
-char const* FIPOutput = "FIP.txt";				// Fused pool (FHP in the paper)
-char const* RIPOutput = "RIP.txt";				// Releasing pool (RHP in the paper)
-char const* capOutput= "cap.txt";				// ??? I don't know what this one is, it's Variable 28 in the X vector
-char const* noiseOutput= "noise.txt";				// ??? I don't know how this works, var 29 in X vector
-
-//
+char const* IRPOutput = "IRP.txt"; 						// immediately releasable pool		x[k+22] place
+char const* PPOutput = "PP.txt";							// primed pool								x[k+23] place
+char const* DPOutput ="DP.txt";							// docked pool								x[k+24]
+char const* FIPOutput = "FIP.txt";						// fused pool (FHP in the paper)
+char const* RIPOutput = "RIP.txt";						// releasing pool (RHP in the paper)
+char const* capOutput= "cap.txt";						// ??? I don't know what this one is, it's Variable 28 in the X vector
+char const* noiseOutput= "noise.txt";					// ??? I don't know how this works, var 29 in X vector
+	
 double NN[cellNumber][15];			// nearest neighbor, lists the cell numbers for up to 15 adjacent cells for each cell
-int CBool[cellNumber]={};				
 double Frequency=10; 
 double delt;
 double period1=1000*1/Frequency;
@@ -118,15 +116,9 @@ int numCores=4;
 
 void BetaSolver( vector_type x , vector_type dxdt , double  tStep, double tMax)
 {
-
-	double t;
 	double Glucose=11.0;
 
-	//if (dt<tMax/4)
-	//{
-	//   Glucose = 3.0;
-	//}
-	for(t=0;t<tMax;t=t+tStep)
+	for(double t=0;t<tMax;t=t+tStep)
 	{
 		/* Disabled glucose incrementer
 		if (dt<tMax/4)
@@ -143,16 +135,6 @@ void BetaSolver( vector_type x , vector_type dxdt , double  tStep, double tMax)
 		}
 		*/
 
-		
-		/* This doesn't perform a function yet, but I'm not removing it
-			because I want to keep the randoms the same so I can test
-			outputs and make sure nothing changed as I update the code
-		*/
-		int randNum;
-		randNum=rand() % 100;
-		// end of depricated
-		
-
 #pragma omp parallel num_threads(numCores)
 #pragma omp for
 		for (int j=0;j<cellNumber;j++)
@@ -160,7 +142,7 @@ void BetaSolver( vector_type x , vector_type dxdt , double  tStep, double tMax)
 			double hPos;
 			ChR2Current ChR2Info;
 			hPos=randPos[j]/(10*10);
-			int	zPos=floor(hPos);
+			int zPos=floor(hPos);
 			int xyPos=randPos[j]%(10*10);
 			double Vm=x[0+j*30];
 			double Nai=x[1+j*30];
@@ -184,6 +166,7 @@ void BetaSolver( vector_type x , vector_type dxdt , double  tStep, double tMax)
 			double O2=x[19+j*30];
 			double C1=x[20+j*30];
 			double C2=x[21+j*30];
+			
 			// exocytosis variables
 			double IRP=x[22+j*30];
 			double PP=x[23+j*30];
@@ -192,9 +175,9 @@ void BetaSolver( vector_type x , vector_type dxdt , double  tStep, double tMax)
 			double FIP=x[26+j*30];
 			double RIP=x[27+j*30];
 			double Cap=x[28+j*30];
+			
 			//noise
 			double Pns=x[29+j*30];
-
 			double KRe=0.000126;
 			double Kfa=0.0000063 ;
 			double Stoichi=2.5;
