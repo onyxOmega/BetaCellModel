@@ -1,7 +1,7 @@
 #ifndef BETACELL_H
 #define BETACELL_H
-
 #endif // BETACELL_H
+
 #include <stdio.h>
 #include <iostream>
 #include <boost/numeric/odeint.hpp>
@@ -49,7 +49,6 @@ const double yini4=0.0047417301517704;
 vector<double> potential;
 vector<double> TimeLoc;
 double pMutant;
-int totalnodes;
 using namespace boost;
 
 double pKATP[2000];
@@ -58,19 +57,19 @@ double tOld=0;
 const int cellNumber=1000;
 
 typedef boost::array< double,30*cellNumber > state_type;
-double gKATPar[2000];
-double IKATPvec[2000];
-double gCoup[2000];
-double gKtoar[2000];
-double PCaERar[2000];
-double gKCaBKar[2000];
-double ATPar[2000];
-double PNACAar[2000];
-double Prelar[2000];
-double Popar[2000];
-double KRev[2000];
-double gChR2[2000];
-double RandomSeed[2000];
+double gKATPar[cellNumber];
+double IKATPvec[cellNumber];
+double gCoup[cellNumber];
+double gKtoar[cellNumber];
+double PCaERar[cellNumber];
+double gKCaBKar[cellNumber];
+double ATPar[cellNumber];
+double PNACAar[cellNumber];
+double Prelar[cellNumber];
+double Popar[cellNumber];
+double KRev[cellNumber];
+double gChR2[cellNumber];
+double RandomSeed[cellNumber];
 vector<int> randomCellVector(cellNumber);
 double alphaPos[390];
 int* randPos=new int[cellNumber];
@@ -80,31 +79,30 @@ int NumRows=100;
 double tMax;
 double cellClass[1000][2];
 double cellPos[cellNumber][3];
-int testBool=1;
-char const* potentialname="potential.txt";
-char const* timename="time.txt";
-char const* calciuminfo="calcium.txt";
-char const* sodiuminfo="sodium.txt";
-char const* potassiuminfo="potassium.txt";
-char const* caerinfo="caer.txt";
-char const* atpinfo="atp.txt";
-char const* adpinfo="adp.txt";
-char const* O1info="O1.txt";
-char const* O2info="O2txt";
-char const* C1info="C1.txt";
-char const* C2info="C2.txt";
-//exocytosis variables
+
+char const* potentialOutput= "potential.txt";
+char const* timeOutput= "time.txt";
+char const* calciumOutput= "calcium.txt";
+char const* sodiumOutput= "sodium.txt";
+char const* potassiumOutput= "potassium.txt";
+char const* caerOutput= "caer.txt";
+char const* atpOutput= "atp.txt";
+char const* adpOutput= "adp.txt";
+char const* O1Output= "O1.txt";
+char const* O2Output= "O2.txt";
+char const* C1Output= "C1.txt";
+char const* C2Output= "C2.txt";
 
 // The exocytosis model is based on the paper "Newcomer insulin
 // secretory granules as a highly calcium sensitive pool" by Morten
 // Gram Penderson and Arthur Sherman
-char const* IRPinfo=new char; 				// immediately releasable pool		x[k+22] place
-char const* PPinfo=new char;					// primed pool								x[k+23] place
-char const* DPinfo=new char;				// Docked pool								x[k+24]
-char const* FIPinfo=new char;				// Fused pool (FHP in the paper)
-char const* RIPinfo=new char;				// Releasing pool (RHP in the paper)
-char const* Capinfo=new char;				// ??? I don't know what this one is, it's Variable 28 in the X vector
-char const* Noiseinfo=new char;				// ??? I don't know how this works, var 29 in X vector
+char const* IRPOutput = "IRP.txt"; 				// immediately releasable pool		x[k+22] place
+char const* PPOutput = "PP.txt";					// primed pool								x[k+23] place
+char const* DPOutput ="DP.txt";				// Docked pool								x[k+24]
+char const* FIPOutput = "FIP.txt";				// Fused pool (FHP in the paper)
+char const* RIPOutput = "RIP.txt";				// Releasing pool (RHP in the paper)
+char const* capOutput= "cap.txt";				// ??? I don't know what this one is, it's Variable 28 in the X vector
+char const* noiseOutput= "noise.txt";				// ??? I don't know how this works, var 29 in X vector
 
 //
 double NN[cellNumber][15];			// nearest neighbor, lists the cell numbers for up to 15 adjacent cells for each cell
@@ -118,7 +116,7 @@ typedef boost::numeric::ublas::vector< double> vector_type;
 typedef boost::numeric::ublas::matrix< double > matrix_type;
 int numCores=4;
 
-void BetaSolver( vector_type x , vector_type dxdt , double  dt  )
+void BetaSolver( vector_type x , vector_type dxdt , double  tStep, double duration)
 {
 
 	double t;
@@ -128,10 +126,8 @@ void BetaSolver( vector_type x , vector_type dxdt , double  dt  )
 	//{
 	//   Glucose = 3.0;
 	//}
-	
-	double tStep=dt;
 
-	for(t=0;t<tMax;t=t+dt)
+	for(t=0;t<tMax;t=t+tStep)
 	{
 		
 		/* Disabled glucose incrementer
@@ -149,30 +145,25 @@ void BetaSolver( vector_type x , vector_type dxdt , double  dt  )
 		}
 		*/
 
-		//srand(1);
+		
+		/* This doesn't perform a function yet, but I'm not removing it
+			because I want to keep the randoms the same so I can test
+			outputs and make sure nothing changed as I update the code
+		*/
 		int randNum;
 		randNum=rand() % 100;
-
-		if (randNum<2)
-		{
-			cout<< "the time is "<<t<<endl;
-		}
+		// end of depricated
+		
 
 #pragma omp parallel num_threads(numCores)
 #pragma omp for
 		for (int j=0;j<cellNumber;j++)
 		{
-
 			double hPos;
-
 			ChR2Current ChR2Info;
-
 			hPos=randPos[j]/(10*10);
-
 			int	zPos=floor(hPos);
-
 			int xyPos=randPos[j]%(10*10);
-
 			double Vm=x[0+j*30];
 			double Nai=x[1+j*30];
 			double Ki=x[2+j*30];
@@ -214,7 +205,6 @@ void BetaSolver( vector_type x , vector_type dxdt , double  dt  )
 			double kATP=0.000062 ;
 			double kADPf=0.0002 ;
 			double kADPb=0.00002;
-
 			double Naout=140;
 			double Kout=5.4;
 			double Caout=2.6;
@@ -223,13 +213,10 @@ void BetaSolver( vector_type x , vector_type dxdt , double  dt  )
 			double volER=280;
 			double fi=0.01;
 			double fer=0.025;
-
 			double totalATP=ATPar[j];
 			double ADPb=totalATP-ATP-MgADP/0.55;
-
 			int Test;
 			int hereV;
-
 			double Vsum=0;
 			double currCellNum=j;
 			double gCoupEQ;
@@ -652,48 +639,49 @@ void BetaSolver( vector_type x , vector_type dxdt , double  dt  )
 
 		if ((t-tOld)>100)
 		{
+			ofstream outFileArray[30];
 			tOld=t;
-			std::ofstream outfile;
-			outfile.open(potentialname,ios::app);
-			std::ofstream outfileCalcium;
-			outfileCalcium.open(calciuminfo,ios::app);
+			ofstream outfilePotential;
+			outfilePotential.open(potentialOutput,ios::app);
+			ofstream outfileCalcium;
+			outfileCalcium.open(calciumOutput,ios::app);
 			ofstream outfileSodium;
-			outfileSodium.open(sodiuminfo,ios::app);
+			outfileSodium.open(sodiumOutput,ios::app);
 			ofstream outfilePotassium;
-			outfilePotassium.open(potassiuminfo,ios::app);
+			outfilePotassium.open(potassiumOutput,ios::app);
 			ofstream outfileCaer;
-			outfileCaer.open(caerinfo,ios::app);
+			outfileCaer.open(caerOutput,ios::app);
 			ofstream outfileATP;
-			outfileATP.open(atpinfo,ios::app);
+			outfileATP.open(atpOutput,ios::app);
 			ofstream outfileADP;
-			outfileADP.open(adpinfo,ios::app);
+			outfileADP.open(adpOutput,ios::app);
 			ofstream outfileO1;
 			ofstream outfileO2;
 			ofstream outfileC1;
 			ofstream outfileC2;
-			outfileO1.open(O1info,ios::app);
-			outfileO2.open(O2info,ios::app);
-			outfileC1.open(C1info,ios::app);
-			outfileC2.open(C2info,ios::app);
-			//exocytosis files
+			outfileO1.open(O1Output);
+			outfileO2.open(O2Output,ios::app);
+			outfileC1.open(C1Output,ios::app);
+			outfileC2.open(C2Output,ios::app);
+			
 			ofstream outfileIRP;
-			outfileIRP.open(IRPinfo,ios::app);
+			outfileIRP.open(IRPOutput,ios::app);
 			ofstream outfilePP;
-			outfilePP.open(PPinfo,ios::app);
+			outfilePP.open(PPOutput,ios::app);
 			ofstream outfileDP;
-			outfileDP.open(DPinfo,ios::app);
+			outfileDP.open(DPOutput,ios::app);
 			ofstream outfileFIP;
-			outfileFIP.open(FIPinfo,ios::app);
+			outfileFIP.open(FIPOutput,ios::app);
 			ofstream outfileRIP;
-			outfileRIP.open(RIPinfo,ios::app);
+			outfileRIP.open(RIPOutput,ios::app);
 			ofstream outfileCap;
-			outfileCap.open(Capinfo,ios::app);
+			outfileCap.open(capOutput,ios::app);
 			ofstream outfileNoise;
-			outfileNoise.open(Noiseinfo,ios::app);
+			outfileNoise.open(noiseOutput,ios::app);
 			
 			for (int k=0;k<30*cellNumber;k=k+30)
 			{
-				outfile<<x[k]<<' ';
+				outfilePotential<<x[k]<<' ';
 				outfileSodium<<x[k+1]<<' ';
 				outfilePotassium<<x[k+2]<<' ';
 				outfileCaer<<x[k+4]<<' ';
@@ -713,7 +701,7 @@ void BetaSolver( vector_type x , vector_type dxdt , double  dt  )
 				outfileNoise<<x[k+29]<<' ';
 			}
 			
-			outfile<<' '<<endl;
+			outfilePotential<<' '<<endl;
 			outfileCalcium<<' '<<endl;
 			outfileSodium<<' '<<endl;
 			outfilePotassium<<' '<<endl;
@@ -731,7 +719,7 @@ void BetaSolver( vector_type x , vector_type dxdt , double  dt  )
 			outfileRIP<<' '<<endl;
 			outfileCap<<' '<<endl;
 			outfileNoise<<' '<<endl;
-			outfile.close();
+			outfilePotential.close();
 			outfileATP.close();
 			outfileADP.close();
 			outfileO1.close();
@@ -751,7 +739,7 @@ void BetaSolver( vector_type x , vector_type dxdt , double  dt  )
 			outfileNoise.close();
 
 			std::ofstream outfile2;
-			outfile2.open(timename,ios::app);
+			outfile2.open(timeOutput,ios::app);
 			outfile2<<t+dt<<endl;
 			outfile2.close();
 		}
