@@ -116,7 +116,7 @@ typedef boost::numeric::ublas::vector< double> vector_type;
 typedef boost::numeric::ublas::matrix< double > matrix_type;
 int numCores=4;
 
-void BetaSolver( vector_type x , vector_type dxdt , double  tStep, double duration)
+void BetaSolver( vector_type x , vector_type dxdt , double  tStep, double tMax)
 {
 
 	double t;
@@ -126,10 +126,8 @@ void BetaSolver( vector_type x , vector_type dxdt , double  tStep, double durati
 	//{
 	//   Glucose = 3.0;
 	//}
-
 	for(t=0;t<tMax;t=t+tStep)
 	{
-		
 		/* Disabled glucose incrementer
 		if (dt<tMax/4)
 		{
