@@ -76,22 +76,25 @@ int* randPos=new int[cellNumber];
 double data[100][100];
 int NumCols=100;
 int NumRows=100;
-double tMax;
 double cellClass[1000][2];
 double cellPos[cellNumber][3];
 
-char const* potentialOutput= "potential.txt";
-char const* timeOutput= "time.txt";
-char const* calciumOutput= "calcium.txt";
-char const* sodiumOutput= "sodium.txt";
-char const* potassiumOutput= "potassium.txt";
+char const* timeOutput= "time.txt";				
+char const* potentialOutput= "potential.txt";			// membrane potential	
+char const* calciumOutput= "calcium.txt";			// intracellular calcium
+char const* sodiumOutput= "sodium.txt";				// intracellular sodium
+char const* potassiumOutput= "potassium.txt";	// intracellular potassium
 char const* caerOutput= "caer.txt";						// endoplasmic reticulum calcim
-char const* atpOutput= "atp.txt";
-char const* adpOutput= "adp.txt";
-char const* O1Output= "O1.txt";
-char const* O2Output= "O2.txt";
-char const* C1Output= "C1.txt";
-char const* C2Output= "C2.txt";
+char const* atpOutput= "atp.txt";						// intracellular ATP
+char const* adpOutput= "adp.txt";						// intracellular ADP
+
+// These four functions don't do anything. They load a set of initial values
+// (all 1, -1 or 0), add 0 for each time increment, and output it to a txt
+// file.
+char const* O1Output= "O1.txt";							// Right now, these
+char const* O2Output= "O2.txt";							// four functions don't
+char const* C1Output= "C1.txt";							// do anything. I don't
+char const* C2Output= "C2.txt";							// know what they were meant for
 
 // The exocytosis model is based on the paper "Newcomer insulin
 // secretory granules as a highly calcium sensitive pool" by Morten
@@ -721,7 +724,7 @@ void BetaSolver( vector_type x , vector_type dxdt , double  tStep, double tMax)
 
 			std::ofstream outfile2;
 			outfile2.open(timeOutput,ios::app);
-			outfile2<<t+dt<<endl;
+			outfile2<<t<<endl;
 			outfile2.close();
 		}
 	}
