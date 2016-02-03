@@ -21,13 +21,11 @@
 #include <boost/multi_array.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
-//#include <boost/filesystem/operations.hpp>
-//#include <boost/filesystem/path.hpp>
-//#include <boost/progress.hpp>
 #include "BetaCell.h"
 
 int main( int argc , char **argv )
 {
+	// Delete old output files
 	if (remove(O1Output)) perror("Error 1");
 	if (remove(O2Output)) perror("Error 2"); 
 	if (remove(C1Output)) perror("Error 3");
@@ -54,7 +52,7 @@ int main( int argc , char **argv )
 	/* The following is a general implementation for pulling in a series 
 		of user defined variable values from an imput file. Not yet 
 		implemented for variable assignment. So it doesn't do anything
-		useful yet.
+		useful yet. - WLF
  	*/
 	string userVarMatrix[2][5];
 	ifstream userVarFile;
@@ -84,7 +82,7 @@ int main( int argc , char **argv )
 		cell in the islet; cellFile lists coordinates for each cell (which 
 		don't seem to be used at all in this or BetaCell.h); RVFile
 		pulls the output from the RandomVariables program, which
-		includes randomly generated cellular attributes.
+		includes randomly generated cellular attributes. - WLF
 	*/
 	
 	ifstream varsFile ("vars5exo.txt");
@@ -144,9 +142,6 @@ int main( int argc , char **argv )
 		RVFile.close();
 	}
 
-	/* Set the time in milliseconds and run the BetaSolver.
-	
-	*/
 	double tMax=2000.00;
 	double tStep = 0.18;
 	BetaSolver(x1,dxdt,tStep, tMax);
