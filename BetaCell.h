@@ -1,17 +1,24 @@
 #ifndef BETACELL_H
 #define BETACELL_H
 
+#include "ChR2Class.h" 
+#include "BCell.h"
+#include "IsletSimulator.h"
+#include <ctime>
 #include <stdio.h>
+#include <omp.h>
 #include <iostream>
-#include <boost/numeric/odeint.hpp>
-#include <boost/multi_array.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/io.hpp>
+#include <string>
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <ostream>
 #include <fstream>
 #include <vector>
+#include <boost/multi_array.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/odeint.hpp>
+#include <boost/numeric/ublas/io.hpp>
 #include <boost/random/detail/config.hpp>
 #include <boost/random.hpp>
 #include <boost/random/normal_distribution.hpp>
@@ -19,15 +26,8 @@
 #include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/container/vector/vector_fwd.hpp>
 #include <boost/fusion/include/vector_fwd.hpp>
-#include <omp.h>
-#include <string>
-#include <algorithm>
 #include <boost/math/distributions/skew_normal.hpp>
-//#include "ChR2CurrentPulseV3.h"
-#include "ChR2Class.h" 
-#include "BCell.h"
-#include "IsletSimulator.h"
-#include <ctime>
+
 using namespace std;
 using namespace boost::numeric::odeint;
 using namespace boost::math;
@@ -35,12 +35,12 @@ using namespace boost::math;
 typedef boost::numeric::ublas::matrix<double> matrix_type;
 //typedef boost::fusion::vector2<double,double> state_type;
 //boost::array<state_type::index,2> shape={{18,2}};
+
 const double R=8.3143 ;
 const double Tem=310.15 ;
 const double F=96.4867 ;
 const double RTF=R*Tem/F ;
 const double RTF2=RTF/2 ;
-//const double Glucose=8;
 const double yini0=-69.8663703359279 ;
 const double yini1=7.92502913389466 ;
 const double yini2=125.248586232226 ;
@@ -71,14 +71,8 @@ double Popar[cellNumber];
 double KRev[cellNumber];
 double gChR2[cellNumber];
 double RandomSeed[cellNumber];
-vector<int> randomCellVector(cellNumber);
-double alphaPos[390];
+
 int* randPos=new int[cellNumber];						// I don't think this is fully implemented. -WLF
-double data[100][100];
-int NumCols=100;
-int NumRows=100;
-double cellClass[1000][2];
-double cellPos[cellNumber][3];
 
 char const* timeOutput= "time.txt";				
 char const* potentialOutput= "potential.txt";			// membrane potential	
@@ -92,15 +86,15 @@ char const* adpOutput= "adp.txt";						// intracellular ADP
 /* These four functions don't do anything. They load a set of initial values
 	(all 1, -1 or 0), add 0 for each time increment, and output it to a txt
 	file.  -WLF	*/
-char const* O1Output= "O1.txt";							
-char const* O2Output= "O2.txt";							
-char const* C1Output= "C1.txt";							
-char const* C2Output= "C2.txt";							
+//char const* O1Output= "O1.txt";							
+//char const* O2Output= "O2.txt";							
+//char const* C1Output= "C1.txt";							
+//char const* C2Output= "C2.txt";							
 
 /* The exocytosis model is based on the paper "Newcomer insulin
 	secretory granules as a highly calcium sensitive pool" by Morten
 	Gram Penderson and Arthur Sherman. - WLF */
-char const* IRPOutput = "IRP.txt"; 						// immediately releasable pool		x[k+22] 
+char const* IRPOutput = "IRP.txt"; 					 	// immediately releasable pool		x[k+22] 
 char const* PPOutput = "PP.txt";							// primed pool								x[k+23] 
 char const* DPOutput ="DP.txt";							// docked pool								x[k+24]
 char const* FIPOutput = "FIP.txt";						// fused pool (FHP in the paper)
@@ -111,16 +105,16 @@ char const* varFileName = "UserDefinedVars.txt";
 double NN[cellNumber][15];								// nearest neighbor, lists the cell numbers for up to 15 adjacent cells for each cell
 
 //[ stiff_system_definition
-typedef boost::numeric::ublas::vector< double> vector_type;
-typedef boost::numeric::ublas::matrix< double > matrix_type;
+typedef boost::numeric::ublas::vector<double> vector_type;
+typedef boost::numeric::ublas::matrix<double> matrix_type;
 int numCores=4;
 
-void BetaSolver(vector_type x , vector_type dxdt, double  tStep, double tMax)
+void BetaSolver(vector_type x, vector_type dxdt, double tStep, double tMax)
 {
 	/* This array will eventually be implemented as an object vector in
 		an islet.
 	*/
-	BCell betaCells[cellNumber]; 
+	//BCell betaCells[cellNumber]; 
 
 	// Create and initialize a new IsletSimulator object
 	IsletSimulator simIslet;
@@ -409,10 +403,10 @@ void BetaSolver(vector_type x , vector_type dxdt, double  tStep, double tMax)
 			double IChR2=0;
 
 			// These don't do anything at the moment. -WLF
-			double dO1=0;
-			double dO2=0;
-			double dC1=0;
-			double dC2=0;
+			//double dO1=0;
+			//double dO2=0;
+			//double dC1=0;
+			//double dC2=0;
 			
 			//IChR2=ChR2Current(10000,dt,15000);
 			//double IChR2=gChR2[j]*Vm*0.3*(O1+0.04*O2);
@@ -574,10 +568,10 @@ void BetaSolver(vector_type x , vector_type dxdt, double  tStep, double tMax)
 			dxdt[15+j*30]=E2_tot*kf+I1*beta1+I2*beta2-E1_tota*(kb+alpha1+alpha2) ;
 			dxdt[16+j*30]=E1_tota*alpha1-I1*beta1 ;
 			dxdt[17+j*30]=E1_tota*alpha2-I2*beta2 ;
-			dxdt[18+j*30]=dO1;
-			dxdt[19+j*30]=dO2;
-			dxdt[20+j*30]=dC1;
-			dxdt[21+j*30]=dC2;
+			//dxdt[18+j*30]=dO1;
+			//dxdt[19+j*30]=dO2;
+			//dxdt[20+j*30]=dC1;
+			//dxdt[21+j*30]=dC2;
 			
 			//exocytosis ODEs
 			dxdt[22+j*30]=r1 * PP - r_1 * IRP - fusion_I * IRP;
@@ -650,10 +644,10 @@ void BetaSolver(vector_type x , vector_type dxdt, double  tStep, double tMax)
 			ofstream outfileO2;
 			ofstream outfileC1;
 			ofstream outfileC2;
-			outfileO1.open(O1Output);
-			outfileO2.open(O2Output,ios::app);
-			outfileC1.open(C1Output,ios::app);
-			outfileC2.open(C2Output,ios::app);
+			//outfileO1.open(O1Output);
+			//outfileO2.open(O2Output,ios::app);
+			//outfileC1.open(C1Output,ios::app);
+			//outfileC2.open(C2Output,ios::app);
 			ofstream outfileIRP;
 			outfileIRP.open(IRPOutput,ios::app);
 			ofstream outfilePP;
@@ -678,10 +672,10 @@ void BetaSolver(vector_type x , vector_type dxdt, double  tStep, double tMax)
 				outfileCalcium<<x[k+3]<<' ';
 				outfileATP<<x[k+5]<<' ';
 				outfileADP<<x[k+6]<<' ';
-				outfileO1<<x[k+18]<<' ';
-				outfileO2<<x[k+19]<<' ';
-				outfileC1<<x[k+20]<<' ';
-				outfileC2<<x[k+21]<<' ';
+				//outfileO1<<x[k+18]<<' ';
+				//outfileO2<<x[k+19]<<' ';
+				//outfileC1<<x[k+20]<<' ';
+				//outfileC2<<x[k+21]<<' ';
 				outfileIRP<<x[k+22]<<' ';
 				outfilePP<<x[k+23]<<' ';
 				outfileDP<<x[k+24]<<' ';

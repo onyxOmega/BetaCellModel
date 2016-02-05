@@ -1,3 +1,5 @@
+#include "BetaCell.h"
+
 #include <stdio.h>
 #include <iostream>
 #include <cassert>
@@ -21,19 +23,26 @@
 #include <boost/multi_array.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
-#include "BetaCell.h"
+#include <boost/lexical_cast.hpp>
+
 
 int main( int argc , char **argv )
 {
-	
+	double tMax=500.00;
+//	if(argc != 0)
+//	{
+//		tMax = boost::lexical_cast<double>(argv[1]);
+//	}
+
 	/* Delete old output files. Shoddy error implementation, but this is
 		temporary. Long term, outputs will be automatically distributed
 		into unique folders. - WLF
 	*/
-	if (remove(O1Output)) perror("Error 1");
-	if (remove(O2Output)) perror("Error 2"); 
-	if (remove(C1Output)) perror("Error 3");
-	if (remove(C2Output)) perror("Error 4");
+	
+	//if (remove(O1Output)) perror("Error 1");
+	//if (remove(O2Output)) perror("Error 2"); 
+	//if (remove(C1Output)) perror("Error 3");
+	//if (remove(C2Output)) perror("Error 4");
 	if (remove(potentialOutput)) perror("Error 5");
 	if (remove(timeOutput)) perror("Error 6");
 	if (remove(calciumOutput)) perror("Error 7");
@@ -84,7 +93,9 @@ int main( int argc , char **argv )
 		}
 		NNFile.close();
 	}
-		
+	
+
+	/* not implemented
 	ifstream cellFile("XYZpos.txt");
 	if(cellFile.is_open())
 	{
@@ -97,6 +108,7 @@ int main( int argc , char **argv )
 		}
 		cellFile.close();
 	}
+	End. -WLF */
 	
 	ifstream RVFile("RandomVars.txt");
 	if(RVFile.is_open())
@@ -119,7 +131,6 @@ int main( int argc , char **argv )
 		RVFile.close();
 	}
 
-	double tMax=2000.00;
 	double tStep = 0.18;
 	BetaSolver(x1,dxdt,tStep, tMax);
 

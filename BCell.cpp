@@ -1,4 +1,5 @@
 #include "BCell.h"
+
 #include <iostream>
 
 void BCell::initialize()

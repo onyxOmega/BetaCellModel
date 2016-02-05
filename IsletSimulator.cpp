@@ -1,10 +1,12 @@
 #include "IsletSimulator.h"
+
 #include <iostream>
 #include <string>
 #include <stdio.h>
 #include <ostream>
 #include <fstream>
 #include <sstream>
+
 #include <boost/lexical_cast.hpp>
 
 using namespace std;
@@ -91,9 +93,9 @@ void IsletSimulator::setUserDefinedVars()
 	{
 		ktd = 0.026;
 	}
-	cout << "ktt = " << ktt << "; kdd = " << kdd << "; ktd = " << ktd;
 }
 
+// Getters
 double IsletSimulator::get_ktt() const
 {
 	return ktt;
