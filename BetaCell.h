@@ -1,6 +1,5 @@
 #ifndef BETACELL_H
 #define BETACELL_H
-#endif // BETACELL_H
 
 #include <stdio.h>
 #include <iostream>
@@ -26,6 +25,8 @@
 #include <boost/math/distributions/skew_normal.hpp>
 //#include "ChR2CurrentPulseV3.h"
 #include "ChR2Class.h" 
+#include "BCell.h"
+#include "Islet.h"
 #include <ctime>
 using namespace std;
 using namespace boost::numeric::odeint;
@@ -106,7 +107,7 @@ char const* FIPOutput = "FIP.txt";						// fused pool (FHP in the paper)
 char const* RIPOutput = "RIP.txt";						// releasing pool (RHP in the paper)
 char const* capOutput= "cap.txt";						// ??? I don't know what this one is, it's Variable 28 in the X vector
 char const* noiseOutput= "noise.txt";					// ??? I don't know how this works, var 29 in X vector
-	
+char const* varFileName = "UserDefinedVars.txt";
 double NN[cellNumber][15];								// nearest neighbor, lists the cell numbers for up to 15 adjacent cells for each cell
 
 //[ stiff_system_definition
@@ -114,8 +115,20 @@ typedef boost::numeric::ublas::vector< double> vector_type;
 typedef boost::numeric::ublas::matrix< double > matrix_type;
 int numCores=4;
 
-void BetaSolver( vector_type x , vector_type dxdt , double  tStep, double tMax)
+void BetaSolver(vector_type x , vector_type dxdt, double  tStep, double tMax)
 {
+	/* This array will eventually be implemented as an object vector in
+		an islet.
+	*/
+	BCell betaCells[cellNumber]; 
+
+	// Create a new Islet object
+	Islet simIslet;
+	simIslet.initialize(varFileName);
+	
+	double kdd=0.01;
+	double ktt=0.05;
+	double ktd=0.026;
 	double Glucose=11.0;
 
 	for(double t=0;t<tMax;t=t+tStep)
@@ -271,9 +284,6 @@ void BetaSolver( vector_type x , vector_type dxdt , double  tStep, double tMax)
 			double  RNa_K_TRPM=0.8;
 
 			//Ikatp params
-			double kdd=0.01;
-			double ktt=0.05;
-			double ktd=0.026;
 			double gKATP=2.31;
 
 			//IKto params
@@ -727,3 +737,5 @@ void BetaSolver( vector_type x , vector_type dxdt , double  tStep, double tMax)
 
 #pragma omp barrier
 };
+
+#endif // BETACELL_H

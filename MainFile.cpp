@@ -25,57 +25,34 @@
 
 int main( int argc , char **argv )
 {
-	// Delete old output files
+	
+	/* Delete old output files. Shoddy error implementation, but this is
+		temporary. Long term, outputs will be automatically distributed
+		into unique folders. - WLF
+	*/
 	if (remove(O1Output)) perror("Error 1");
 	if (remove(O2Output)) perror("Error 2"); 
 	if (remove(C1Output)) perror("Error 3");
-	if (remove(C2Output)) perror("Error4");
-	if (remove(potentialOutput)) perror("Error5");
-	if (remove(timeOutput)) perror("Error6");
-	if (remove(calciumOutput)) perror("Error7");
-	if (remove(sodiumOutput)) perror("Error8");
-	if (remove(potassiumOutput)) perror("Error9");
-	if (remove(caerOutput)) perror("Error10");
-	if (remove(atpOutput)) perror("Error11");
-	if (remove(adpOutput)) perror("Error12");
-	if (remove(PPOutput)) perror("Error13");
-	if (remove(IRPOutput)) perror("Error14");
-	if (remove(DPOutput)) perror("Error15");
-	if (remove(FIPOutput)) perror("Error16");
-	if (remove(RIPOutput)) perror("Error17");
-	if (remove(capOutput)) perror("Error18");
-	if (remove(noiseOutput)) perror("Error19");
+	if (remove(C2Output)) perror("Error 4");
+	if (remove(potentialOutput)) perror("Error 5");
+	if (remove(timeOutput)) perror("Error 6");
+	if (remove(calciumOutput)) perror("Error 7");
+	if (remove(sodiumOutput)) perror("Error 8");
+	if (remove(potassiumOutput)) perror("Error 9");
+	if (remove(caerOutput)) perror("Error 10");
+	if (remove(atpOutput)) perror("Error 11");
+	if (remove(adpOutput)) perror("Error 12");
+	if (remove(PPOutput)) perror("Error 13");
+	if (remove(IRPOutput)) perror("Error 14");
+	if (remove(DPOutput)) perror("Error 15");
+	if (remove(FIPOutput)) perror("Error 16");
+	if (remove(RIPOutput)) perror("Error 17");
+	if (remove(capOutput)) perror("Error 18");
+	if (remove(noiseOutput)) perror("Error 19");
 
 	vector_type x1(cellNumber*30);
 	vector_type dxdt(cellNumber*30);
-	
-	/* The following is a general implementation for pulling in a series 
-		of user defined variable values from an imput file. Not yet 
-		implemented for variable assignment. So it doesn't do anything
-		useful yet. - WLF
- 	*/
-	string userVarMatrix[2][5];
-	ifstream userVarFile;
-	userVarFile.open("UserDefinedVars.txt");
-	int i=0;
-	
-	while(!userVarFile.eof())
-	{	
-		char buffer[20];
-		userVarFile.getline(buffer, 20);
-		stringstream varStream;
-		varStream << buffer;
-		varStream.getline(buffer, 10, '=');
-		string strBuffer(buffer);
-		userVarMatrix[0][i] = strBuffer;
-		cout << userVarMatrix[0][i] << " = ";
-		i++;
-		varStream.getline(buffer, 10, ';');
-		strBuffer.assign(buffer);
-		userVarMatrix[1][i] = strBuffer;
-		cout << userVarMatrix[1][i] << ";" << endl;
-	}
-	
+		
 	/*	The following populate variables from data files for use in 
 	    future calculations. The varsFile contains initial values
 		for each cells properties; NNFile lists adjacent cells for each
