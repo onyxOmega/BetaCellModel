@@ -1,12 +1,12 @@
-#ifndef ISLET_H
-#define ISLET_H
+#ifndef ISLETSIMULATOR_H
+#define ISLETSIMULATOR_H
 
 #include <string>
 
-class Islet
+class IsletSimulator
 {
 	private:
-		std::string userVarMatrix[2][5];
+		std::string userVarMatrix[2][10];
 		double ktt, kdd, ktd;
 		
 	public:
@@ -16,5 +16,4 @@ class Islet
 		double get_kdd() const;
 		double get_ktd() const;
 };
-
 #endif

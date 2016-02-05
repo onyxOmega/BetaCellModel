@@ -26,7 +26,7 @@
 //#include "ChR2CurrentPulseV3.h"
 #include "ChR2Class.h" 
 #include "BCell.h"
-#include "Islet.h"
+#include "IsletSimulator.h"
 #include <ctime>
 using namespace std;
 using namespace boost::numeric::odeint;
@@ -122,13 +122,13 @@ void BetaSolver(vector_type x , vector_type dxdt, double  tStep, double tMax)
 	*/
 	BCell betaCells[cellNumber]; 
 
-	// Create a new Islet object
-	Islet simIslet;
+	// Create and initialize a new IsletSimulator object
+	IsletSimulator simIslet;
 	simIslet.initialize(varFileName);
 	
-	double kdd=0.01;
-	double ktt=0.05;
-	double ktd=0.026;
+	double kdd=simIslet.get_kdd();
+	double ktt=simIslet.get_ktt();
+	double ktd=simIslet.get_ktd();
 	double Glucose=11.0;
 
 	for(double t=0;t<tMax;t=t+tStep)

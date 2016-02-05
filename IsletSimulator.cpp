@@ -1,4 +1,4 @@
-#include "Islet.h"
+#include "IsletSimulator.h"
 #include <iostream>
 #include <string>
 #include <stdio.h>
