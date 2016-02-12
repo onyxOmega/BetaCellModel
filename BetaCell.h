@@ -118,7 +118,7 @@ void BetaSolver(vector_type x, vector_type dxdt, IsletSimulator simIslet)
 
 	// Create and initialize a new IsletSimulator object
 	double tMax = simIslet.get_runTime();
-	double tStep = simIslet.get_runTime()
+	double tStep = simIslet.get_runTime();
 	double kdd=simIslet.get_kdd();
 	double ktt=simIslet.get_ktt();
 	double ktd=simIslet.get_ktd();

@@ -33,8 +33,7 @@ int main( int argc , char* argv[] )
 {
 	IsletSimulator simIslet;
 	simIslet.initialize(varFileName);
-	double tMax = simIslet.get_runTime();
-	cout << simIslet.get_runTime();
+	
     // cout << argv[1] << endl;
 	if (argc < 2) 
 	{

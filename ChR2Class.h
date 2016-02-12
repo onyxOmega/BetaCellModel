@@ -22,6 +22,7 @@ const double gO1=.4;
 const double gO2=0.04;
 const double gammaC=0.1;
 const double wavelength=458;
+
 class ChR2Current
 {
 public:
@@ -36,8 +37,6 @@ double dC1;
 double dC2;
 double dO1;
 double dO2;
-
-
 
 void calc_derivs(double,double,double,double,double,double,double,double,double);
 };
