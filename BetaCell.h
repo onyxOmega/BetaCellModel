@@ -109,7 +109,7 @@ typedef boost::numeric::ublas::vector<double> vector_type;
 typedef boost::numeric::ublas::matrix<double> matrix_type;
 int numCores=4;
 
-void BetaSolver(vector_type x, vector_type dxdt, double tStep, double tMax)
+void BetaSolver(vector_type x, vector_type dxdt, IsletSimulator simIslet)
 {
 	/* This array will eventually be implemented as an object vector in
 		an islet.
@@ -117,14 +117,16 @@ void BetaSolver(vector_type x, vector_type dxdt, double tStep, double tMax)
 	//BCell betaCells[cellNumber]; 
 
 	// Create and initialize a new IsletSimulator object
-	IsletSimulator simIslet;
-	simIslet.initialize(varFileName);
-	
+	double tMax = simIslet.get_runTime();
+	double tStep = simIslet.get_runTime()
 	double kdd=simIslet.get_kdd();
 	double ktt=simIslet.get_ktt();
 	double ktd=simIslet.get_ktd();
 	double Glucose=11.0;
-
+	
+	;
+	cout << simIslet.get_runTime();
+	
 	for(double t=0;t<tMax;t=t+tStep)
 	{
 		/* Disabled: Glucose incrementer

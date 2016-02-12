@@ -24,20 +24,45 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/lexical_cast.hpp>
+//#include <boost/filesystem.hpp>
 
 
-int main( int argc , char **argv )
+using namespace std;
+
+int main( int argc , char* argv[] )
 {
-	double tMax=500.00;
-//	if(argc != 0)
-//	{
-//		tMax = boost::lexical_cast<double>(argv[1]);
-//	}
+	IsletSimulator simIslet;
+	simIslet.initialize(varFileName);
+	double tMax = simIslet.get_runTime();
+	cout << simIslet.get_runTime();
+    // cout << argv[1] << endl;
+	if (argc < 2) 
+	{
+        std::cerr << "Usage: " << argv[0] << " <OUTPUT_PATH>" << std::endl;
+        return 1;
+    }
 
 	/* Delete old output files. Shoddy error implementation, but this is
 		temporary. Long term, outputs will be automatically distributed
 		into unique folders. - WLF
 	*/
+	
+	char const* timeOutput= "time.txt";				
+	char const* potentialOutput= "potential.txt";			// membrane potential	
+	char const* calciumOutput= "calcium.txt";			// intracellular calcium
+	char const* sodiumOutput= "sodium.txt";				// intracellular sodium
+	char const* potassiumOutput= "potassium.txt";	// intracellular potassium
+	char const* caerOutput= "caer.txt";						// endoplasmic reticulum calcim
+	char const* atpOutput= "atp.txt";						// intracellular ATP
+	char const* adpOutput= "adp.txt";						// intracellular ADP
+	char const* IRPOutput = "IRP.txt"; 					 	// immediately releasable pool		x[k+22] 
+	char const* PPOutput = "PP.txt";							// primed pool								x[k+23] 
+	char const* DPOutput ="DP.txt";							// docked pool								x[k+24]
+	char const* FIPOutput = "FIP.txt";						// fused pool (FHP in the paper)
+	char const* RIPOutput = "RIP.txt";						// releasing pool (RHP in the paper)
+	char const* capOutput= "cap.txt";						// ??? I don't know what this one is, it's Variable 28 in the X vector
+	char const* noiseOutput= "noise.txt";					// ??? I don't know how this works, var 29 in X vector
+	char const* varFileName = "UserDefinedVars.txt";
 	
 	//if (remove(O1Output)) perror("Error 1");
 	//if (remove(O2Output)) perror("Error 2"); 
@@ -132,7 +157,7 @@ int main( int argc , char **argv )
 	}
 
 	double tStep = 0.18;
-	BetaSolver(x1,dxdt,tStep, tMax);
+	BetaSolver(x1,dxdt,tStep, tMax, simIslet);
 
 	return 0;
 }
