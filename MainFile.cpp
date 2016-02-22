@@ -1,14 +1,16 @@
+#include "BetaCell.h"
+
 #include <stdio.h>
 #include <iostream>
-#include <boost/numeric/odeint.hpp>
-#include <boost/multi_array.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/io.hpp>
 #include <cassert>
 #include <cmath>
 #include <ostream>
 #include <fstream>
 #include <vector>
+#include <omp.h>
+#include <string>
+#include <sstream>
+#include <algorithm>
 #include <boost/random/detail/config.hpp>
 #include <boost/random.hpp>
 #include <boost/random/normal_distribution.hpp>
@@ -16,305 +18,146 @@
 #include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/container/vector/vector_fwd.hpp>
 #include <boost/fusion/include/vector_fwd.hpp>
-#include <omp.h>
-#include <string>
-#include <algorithm>
 #include <boost/math/distributions/skew_normal.hpp>
-#include "BetaCell.h"
+#include <boost/numeric/odeint.hpp>
+#include <boost/multi_array.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/io.hpp>
+#include <boost/lexical_cast.hpp>
+//#include <boost/filesystem.hpp>
 
-int main( int argc , char **argv )
+
+using namespace std;
+
+int main( int argc , char* argv[] )
 {
-
-//while(ChR2CurrentPulse(0,period1,1000,Frequency)>ChR2CurrentPulse(0,delt,1000,Frequency))
-//{
-//delt=delt+0.001;
-//}
-
-
-
-const int lengthNum=cellNumber*30;
-
-
-  // Get the number of processors this job is using:
-int varNumber;
-
-  // Get the rank of the processor this thread is running on.  (Each
-  // processor has a unique rank.)
-
-
-vector_type x1(cellNumber*30);
-vector_type dxdt(cellNumber*30);
-double* varAr=new double[lengthNum];
-ifstream myFile ("vars5exo.txt");
-if (myFile.is_open())
-{
-for (int i=0;i<30*cellNumber;i++)
-{
-myFile>>varAr[i];
-}
-
-myFile.close();
-}
-
-
-
-ifstream infoFile(argv[1]);
-
-string NNfileLine;
-
-getline(infoFile,NNfileLine);
-
-char *NNfileName=(char*)NNfileLine.c_str();
-
-ifstream NNfile(NNfileName);
-for (int i=0;i<cellNumber;i++)
-{
-for (int j=0;j<15;j++)
-{
-NNfile>>NN[i][j];
-}
-}
-
-ifstream cFile("XYZpos.txt");
-if(cFile.is_open())
-{
-for (int i=0; i<cellNumber;i++)
-{
-for (int j=0;j<3;j++)
-{
-cFile>>cellPos[i][j];
-cout<<cellPos[i][j];
-}
-cout<<endl;
-}
-}
-
-string potentialNameLine;
-string timeInfoLine;
-string calciumInfoLine;
-string mutantLine;
-string sodiumInfoLine;
-string potassiumInfoLine;
-string caerInfoLine;
-string atpInfoLine;
-string adpInfoLine;
-string ikatpInfoLine;
-string IRPInfoLine;
-string PPInfoLine;
-string DPInfoLine;
-string FIPInfoLine;
-string RIPInfoLine;
-string CapInfoLine;
-string NoiseInfoLine;
-    
-getline(infoFile,potentialNameLine);
-getline(infoFile,sodiumInfoLine);
-getline(infoFile,potassiumInfoLine);
-getline(infoFile,calciumInfoLine);
-getline(infoFile,caerInfoLine);
-getline(infoFile,atpInfoLine);
-getline(infoFile,adpInfoLine);
-getline(infoFile,IRPInfoLine);
-getline(infoFile,PPInfoLine);
-getline(infoFile,DPInfoLine);
-getline(infoFile,FIPInfoLine);
-getline(infoFile,RIPInfoLine);
-getline(infoFile,CapInfoLine);
-getline(infoFile,timeInfoLine);
-getline(infoFile,NoiseInfoLine);
-getline(infoFile,mutantLine);
-
-char* pEnd;
-
-
-pMutant=strtod(mutantLine.c_str(),&pEnd);
-potentialname=(char*)potentialNameLine.c_str();
-calciuminfo=(char*)calciumInfoLine.c_str();
-sodiuminfo=(char*)sodiumInfoLine.c_str();
-potassiuminfo=(char*)potassiumInfoLine.c_str();
-timename=(char*)timeInfoLine.c_str();
-caerinfo=(char*)caerInfoLine.c_str();
-atpinfo=(char*)atpInfoLine.c_str();
-adpinfo=(char*)adpInfoLine.c_str();
-IRPinfo=(char*)IRPInfoLine.c_str();
-PPinfo=(char*)PPInfoLine.c_str();
-DPinfo=(char*)DPInfoLine.c_str();
-FIPinfo=(char*)FIPInfoLine.c_str();
-RIPinfo=(char*)RIPInfoLine.c_str();
-Capinfo=(char*)CapInfoLine.c_str();
-Noiseinfo=(char*)NoiseInfoLine.c_str();
-    
-remove("O1.txt");
-remove("O2.txt");
-remove("C1.txt");
-remove("C2.txt");
-
-
-
-
-O1info="O1.txt";
-O2info="O2.txt";
-C1info="C1.txt";
-C2info="C2.txt";
-
-
-
-
-
-
-
-
-
-
-
-
-if( remove(ikatpinfo) !=0)
-	perror("Error Delting");
-	else
-		puts("Success");
-
-if( remove(potentialname ) != 0 )
-    perror( "Error deleting file" );
-  else
-    puts( "File successfully deleted" );
-
- if( remove( timename) != 0 )
-    perror( "Error deleting file" );
-  else
-    puts( "File successfully deleted" );
-
-if( remove( cellinfo ) != 0 )
-    perror( "Error deleting file" );
-  else
-    puts( "File successfully deleted" );
-
-if (remove(calciuminfo)!=0)
-	perror("Error Deleting File");
-else
-	puts("File Deleted correctly");
-
-if(remove(sodiuminfo)!=0)
-perror("Error Deleting File");
-else
-puts("Deleted Correctly");
-
-if(remove(potassiuminfo)!=0)
-perror("Error Deleting File");
-else
-puts("Deleted Correctly");
-
-if(remove(caerinfo)!=0)
-perror("Error Deleting File");
-else
-puts("Deleted Correctly");
-
-if(remove(atpinfo)!=0)
-perror("Error Deleting File");
-else
-puts("Deleted Correctly");
-
-if(remove(adpinfo)!=0)
-perror("Error Deleting File");
-else
-puts("Deleted Correctly");
-    
-    if(remove(PPinfo)!=0)
-        perror("Error Deleting File");
-    else
-        puts("Deleted Correctly");
-    
-    if(remove(IRPinfo)!=0)
-        perror("Error Deleting File");
-    else
-        puts("Deleted Correctly");
-    
-    if(remove(DPinfo)!=0)
-        perror("Error Deleting File");
-    else
-        puts("Deleted Correctly");
-    
-    if(remove(FIPinfo)!=0)
-        perror("Error Deleting File");
-    else
-        puts("Deleted Correctly");
-    
-    if(remove(RIPinfo)!=0)
-        perror("Error Deleting File");
-    else
-        puts("Deleted Correctly");
-    
-    if(remove(Capinfo)!=0)
-        perror("Error Deleting File");
-    else
-        puts("Deleted Correctly");
-    if(remove(Noiseinfo)!=0)
-        perror("Error Deleting File");
-    else
-        puts("Deleted Correctly");
-
-int count=0;
-for ( int i=0;i<cellNumber*30;i++)
-{
-x1[i]=varAr[i];
-}
-
-
-
-ofstream excitationFile;
-remove("ChR2Cells.txt");
-excitationFile.open("ChR2Cells.txt");
-
-ifstream randomVar("RandomVars.txt");
-double RandomVarMat[cellNumber][12];
-for(int i=0;i<cellNumber;i++)
-{
-for(int j=0;j<12;j++)
-{
-randomVar>>RandomVarMat[i][j];
-cout<<RandomVarMat[i][j]<<' ';
-}
-cout<<' '<<endl;
-}
-
-//Setting cellular properties
-for(int i=0;i<cellNumber;i++)
-{
-gKATPar[i]=RandomVarMat[i][0];
-gCoup[i]=RandomVarMat[i][1];
-gKtoar[i]=RandomVarMat[i][2];
-PCaERar[i]=RandomVarMat[i][3];
-gKCaBKar[i]=RandomVarMat[i][4];
-PNACAar[i]=RandomVarMat[i][5];
-Prelar[i]=RandomVarMat[i][6];
-Popar[i]=RandomVarMat[i][7];
-ATPar[i]=RandomVarMat[i][8];
-KRev[i]=RandomVarMat[i][9];
-gChR2[i]=RandomVarMat[i][11];
-RandomSeed[i]=RandomVarMat[i][10];
-}
-
-
-//integrate_adaptive(make_controlled(1.0,1.0,stepper_type()),stiff_system(mynode),x1,0.0,100000.00,0.1);
-//doIntegrate(mynode,x1,0.1,1000.0,1.
-tMax=1800000.00;
-totalnodes=1;
-//omp_set_num_threads(1);
-
-
-/*#pragma omp parallel shared(totalnodes)
-{
-const int mynode=omp_get_thread_num();
-
-integrate_const(euler<vector_type>(),stiff_system(mynode),x1,0.0,tMax,0.2);
-
-}
-*/
-
-
-BetaSolver(x1,dxdt,0.18);
-
-
-
-    return 0;
+	IsletSimulator simIslet;
+	simIslet.initialize(varFileName);
+	
+    // cout << argv[1] << endl;
+	if (argc < 2) 
+	{
+        std::cerr << "Usage: " << argv[0] << " <OUTPUT_PATH>" << std::endl;
+        return 1;
+    }
+
+	/* Delete old output files. Shoddy error implementation, but this is
+		temporary. Long term, outputs will be automatically distributed
+		into unique folders. - WLF
+	*/
+	
+	char const* timeOutput= "time.txt";				
+	char const* potentialOutput= "potential.txt";			// membrane potential	
+	char const* calciumOutput= "calcium.txt";			// intracellular calcium
+	char const* sodiumOutput= "sodium.txt";				// intracellular sodium
+	char const* potassiumOutput= "potassium.txt";	// intracellular potassium
+	char const* caerOutput= "caer.txt";						// endoplasmic reticulum calcim
+	char const* atpOutput= "atp.txt";						// intracellular ATP
+	char const* adpOutput= "adp.txt";						// intracellular ADP
+	char const* IRPOutput = "IRP.txt"; 					 	// immediately releasable pool		x[k+22] 
+	char const* PPOutput = "PP.txt";							// primed pool								x[k+23] 
+	char const* DPOutput ="DP.txt";							// docked pool								x[k+24]
+	char const* FIPOutput = "FIP.txt";						// fused pool (FHP in the paper)
+	char const* RIPOutput = "RIP.txt";						// releasing pool (RHP in the paper)
+	char const* capOutput= "cap.txt";						// ??? I don't know what this one is, it's Variable 28 in the X vector
+	char const* noiseOutput= "noise.txt";					// ??? I don't know how this works, var 29 in X vector
+	char const* varFileName = "UserDefinedVars.txt";
+	
+	//if (remove(O1Output)) perror("Error 1");
+	//if (remove(O2Output)) perror("Error 2"); 
+	//if (remove(C1Output)) perror("Error 3");
+	//if (remove(C2Output)) perror("Error 4");
+	if (remove(potentialOutput)) perror("Error 5");
+	if (remove(timeOutput)) perror("Error 6");
+	if (remove(calciumOutput)) perror("Error 7");
+	if (remove(sodiumOutput)) perror("Error 8");
+	if (remove(potassiumOutput)) perror("Error 9");
+	if (remove(caerOutput)) perror("Error 10");
+	if (remove(atpOutput)) perror("Error 11");
+	if (remove(adpOutput)) perror("Error 12");
+	if (remove(PPOutput)) perror("Error 13");
+	if (remove(IRPOutput)) perror("Error 14");
+	if (remove(DPOutput)) perror("Error 15");
+	if (remove(FIPOutput)) perror("Error 16");
+	if (remove(RIPOutput)) perror("Error 17");
+	if (remove(capOutput)) perror("Error 18");
+	if (remove(noiseOutput)) perror("Error 19");
+
+	vector_type x1(cellNumber*30);
+	vector_type dxdt(cellNumber*30);
+		
+	/*	The following populate variables from data files for use in 
+	    future calculations. The varsFile contains initial values
+		for each cells properties; NNFile lists adjacent cells for each
+		cell in the islet; cellFile lists coordinates for each cell (which 
+		don't seem to be used at all in this or BetaCell.h); RVFile
+		pulls the output from the RandomVariables program, which
+		includes randomly generated cellular attributes. - WLF
+	*/
+	
+	ifstream varsFile ("vars5exo.txt");
+	if (varsFile.is_open())
+	{
+		for (int i=0;i<30*cellNumber;i++)
+		{
+			varsFile>>x1[i];
+		}
+		varsFile.close();
+	}
+
+	ifstream NNFile("NN10A.txt");
+	if(NNFile.is_open())
+	{
+		for (int i=0;i<cellNumber;i++)
+		{		
+			for (int j=0;j<15;j++)
+			{
+				NNFile>>NN[i][j];
+			}
+		}
+		NNFile.close();
+	}
+	
+
+	/* not implemented
+	ifstream cellFile("XYZpos.txt");
+	if(cellFile.is_open())
+	{
+		for (int i=0; i<cellNumber;i++)
+		{
+			for (int j=0;j<3;j++)
+			{
+				cellFile>>cellPos[i][j];
+			}
+		}
+		cellFile.close();
+	}
+	End. -WLF */
+	
+	ifstream RVFile("RandomVars.txt");
+	if(RVFile.is_open())
+	{
+		for(int i=0;i<cellNumber;i++)
+		{
+			RVFile >> gKATPar[i];
+			RVFile >> gCoup[i];
+			RVFile >> gKtoar[i];
+			RVFile >> PCaERar[i];
+			RVFile >> gKCaBKar[i];
+			RVFile >> PNACAar[i];
+			RVFile >> Prelar[i];
+			RVFile >> Popar[i];
+			RVFile >> ATPar[i];
+			RVFile >> KRev[i];
+			RVFile >> RandomSeed[i];
+			RVFile >> gChR2[i];
+		}
+		RVFile.close();
+	}
+
+	double tStep = 0.18;
+	BetaSolver(x1,dxdt,tStep, tMax, simIslet);
+
+	return 0;
 }
 

@@ -1,4 +1,3 @@
-NN10A.txt
 potential.txt
 sodium.txt
 potassium.txt
